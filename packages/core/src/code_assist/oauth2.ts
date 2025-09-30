@@ -507,6 +507,12 @@ export async function clearCachedCredentialFile() {
 }
 
 async function fetchAndCacheUserInfo(client: OAuth2Client): Promise<void> {
+  // Allow environments without direct access to Google APIs (or custom gateways)
+  // to skip fetching user info. When GEMINI_SKIP_USERINFO_FETCH is 'true', this
+  // function becomes a no-op.
+  if (process.env['GEMINI_SKIP_USERINFO_FETCH'] === 'true') {
+    return;
+  }
   try {
     const { token } = await client.getAccessToken();
     if (!token) {
